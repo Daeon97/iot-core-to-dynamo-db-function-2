@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: A simple AWS Lambda function that moves data from AWS IoT Core to AWS Dynamo DB
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Timeout: 60
+    Layers:
+      - !Ref GeohashingLayer
+
+Resources:
+  IoTCoreToDynamoDbFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: IoTCoreToDynamoDb
+      CodeUri: .
+      Handler: app.lambdaHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref NimTrack
+      Events:
+        IoTCoreToDynamoDb:
+          Type: IoTRule
+          Properties:
+            Sql: "SELECT * FROM 'esp32/josiah1'"
+            AwsIotSqlVersion: "2016-03-23"
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+        External:
+          - "aws-sdk"
+          - "geohashing"
+  # GeohashingLayer:
+  #   Type: AWS::Serverless::LayerVersion
+  #   Properties:
+  #     LayerName: GeohashingLayer
+  #     Description: Geohashing dependency layer for iot-core-to-dynamo-db-function
+  #     LicenseInfo: "MIT"
+  #     ContentUri: ./geohashing-layer
+  #     CompatibleRuntimes:
+  #       - nodejs16.x
+
+  NimTrack:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "N"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      BillingMode: "PAY_PER_REQUEST"
