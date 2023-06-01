@@ -7,20 +7,21 @@ Globals:
     Runtime: nodejs16.x
     Timeout: 60
     Layers:
-      - !Ref GeohashingLayer
+      - arn:aws:lambda:eu-north-1:580510132728:layer:GeohashingLayer:7
+      - arn:aws:lambda:eu-north-1:580510132728:layer:RandomStringLayer:1
 
 Resources:
-  IoTCoreToDynamoDbFunction:
+  IoTCoreToDynamoDbFunction2:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: IoTCoreToDynamoDb
+      FunctionName: IoTCoreToDynamoDb2
       CodeUri: .
       Handler: app.lambdaHandler
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref NimTrack
+            TableName: !Ref NimTrack2
       Events:
-        IoTCoreToDynamoDb:
+        IoTCoreToDynamoDb2:
           Type: IoTRule
           Properties:
             Sql: "SELECT * FROM 'esp32/josiah1'"
@@ -36,17 +37,9 @@ Resources:
         External:
           - "aws-sdk"
           - "geohashing"
-  # GeohashingLayer:
-  #   Type: AWS::Serverless::LayerVersion
-  #   Properties:
-  #     LayerName: GeohashingLayer
-  #     Description: Geohashing dependency layer for iot-core-to-dynamo-db-function
-  #     LicenseInfo: "MIT"
-  #     ContentUri: ./geohashing-layer
-  #     CompatibleRuntimes:
-  #       - nodejs16.x
+          - "randomstring"
 
-  NimTrack:
+  NimTrack2:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
