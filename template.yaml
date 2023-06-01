@@ -8,6 +8,7 @@ Globals:
     Timeout: 60
     Layers:
       - arn:aws:lambda:eu-north-1:580510132728:layer:GeohashingLayer:7
+      - arn:aws:lambda:eu-north-1:580510132728:layer:RandomStringLayer:1
 
 Resources:
   IoTCoreToDynamoDbFunction2:
@@ -36,6 +37,7 @@ Resources:
         External:
           - "aws-sdk"
           - "geohashing"
+          - "randomstring"
 
   NimTrack2:
     Type: AWS::DynamoDB::Table
